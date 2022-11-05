@@ -1,8 +1,11 @@
 FROM maven:3.8.6-jdk-11 AS MAVEN_TOOL_CHAIN
 WORKDIR /tmp/
 COPY pom.xml /tmp/pom.xml
+COPY mvnw /tmp/mvnw
 COPY src /tmp/src/
-RUN mvn clean install
+
+RUN ./mvnw  clean package
+#RUN mvn clean install
 
 FROM maven:3.8.6-jdk-11
 VOLUME /tmp
