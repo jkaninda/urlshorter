@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="/css/main.css" />
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/alpine-clipboard@2.x.x/dist/alpine-clipboard.js" defer></script>
+    <title>URL Shorter</title>
+</head>
+<body>
+<div x-data="main">
+<div class="main">
+    <header>
+        <h1 class="h1"><a href="/">URL Shorter</a></h1>
+    </header>
+<div class="form">
+    <input type="url" id="targetUrl" x-model="shorter.targetUrl" placeholder="Put Your Long URL Here">
+    <div>
+        <input type="text" maxlength=20 id="custominput" placeholder="Custom URL">
+        <div x-show="error">
+        <p id="error" style="color:red;"><span x-text="message"></span></p>
+        </div>
+    </div>
+    <button x-on:click="getShortUrl" type="button" class="btn btn-dark">🔗 Shorten Me</button>
+</div>
+<br>
+    <div x-show="success">
+        <div class="form" style="margin-bottom : 0px !important;">
+            <input type="text" x-model="url" placeholder="Your Short Url Shown here">
+
+    <p id="success" style="color:cyan"><span x-text="message"></span></p>
+        <button x-on:click="copyShortUrl" type="button" class="btn btn-dark">Copy to Clipboard</button>
+        </div>
+    </div>
+<footer class="infos">
+    <p class="small-text" style="color:grey;">Please Don't Shorten Sensitive Information</p>
+    <p><strong> Powered ❤ by
+        <a href="https://github.com/jkaninda/">Jonas Kaninda</a></strong>
+    </p>
+</footer>
+</div>
+</div>
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('main', () => ({
+            url:'',
+            success:false,
+            error:false,
+            message:'',
+            shorter:{
+                targetUrl:'',
+            },
+            copyShortUrl(){
+                navigator.clipboard.writeText(this.url)
+            },
+            getShortUrl() {
+                if (this.shorter.targetUrl !== '') {
+                    fetch('/api/shorter', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(this.shorter)
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                this.success = true
+                                this.error = false
+                                this.url = data.shortUrl
+                                this.message = data.message
+                                this.shorter.targetUrl = ''
+
+                            } else {
+                                this.error = true
+                                this.success = false
+                                if (data.status === 409) {
+                                    this.message = "This Url exist"
+                                } else {
+                                    alert('Something went wrong')
+
+                                }
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
+
+                }
+            }
+        }))
+
+    })
+</script>
+</body>
+</html>
