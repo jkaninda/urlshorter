@@ -4,7 +4,7 @@ COPY pom.xml /tmp/pom.xml
 COPY mvnw /tmp/mvnw
 COPY src /tmp/src/
 
-RUN ./mvnw  clean package
+RUN mvnw  clean package
 #RUN mvn clean install
 
 FROM maven:3.8.6-jdk-11
