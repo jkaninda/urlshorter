@@ -56,40 +56,58 @@
                 navigator.clipboard.writeText(this.url)
             },
             getShortUrl() {
-                if (this.shorter.targetUrl !== '') {
-                    fetch('/api/shorter', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(this.shorter)
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.success) {
-                                this.success = true
-                                this.error = false
-                                this.url = data.shortUrl
-                                this.message = data.message
-                                this.shorter.targetUrl = ''
-                            } else {
-                                this.error = true
-                                this.success = false
-                                if (data.success===false){
-                                    this.message = data.message
-                                }else if(data.status === 409) {
-                                    this.message = "This Url exist"
-                                }else {
-                                    alert('Something went wrong')
+                 if (this.shorter.targetUrl !== '') {
+                     if (this.isValidHttpUrl(this.shorter.targetUrl)) {
+                         fetch('/api/shorter', {
+                             method: 'POST',
+                             headers: {
+                                 'Content-Type': 'application/json'
+                             },
+                             body: JSON.stringify(this.shorter)
+                         })
+                             .then((response) => response.json())
+                             .then((data) => {
+                                 if (data.success) {
+                                     this.success = true
+                                     this.error = false
+                                     this.url = data.shortUrl
+                                     this.message = data.message
+                                     this.shorter.targetUrl = ''
+                                 } else {
+                                     this.error = true
+                                     this.success = false
+                                     if (data.success === false) {
+                                         this.message = data.message
+                                     } else if (data.status === 409) {
+                                         this.message = "This Url exist"
+                                     } else {
+                                         alert('Something went wrong')
 
-                                }
-                            }
-                        })
-                        .catch((error) => {
-                            console.error('Error:', error);
-                        });
+                                     }
+                                 }
+                             })
+                             .catch((error) => {
+                                 console.error('Error:', error);
+                                 alert('Something went wrong')
 
+                             });
+
+                     }else {
+                         this.error = true
+                         this.success = false
+                         this.message='Please put a valid URL'
+                     }
+                 }
+
+             },
+             isValidHttpUrl(string) {
+                let httpUrl;
+                try {
+                    httpUrl = new URL(string);
+                } catch (_) {
+                    return false;
                 }
+                return httpUrl.protocol === "http:" || httpUrl.protocol === "https:";
             }
         }))
 
