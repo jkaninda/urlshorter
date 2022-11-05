@@ -26,9 +26,25 @@ class UrlShorterServiceImpl(val urlShorterRepository: UrlShorterRepository,val a
     override fun store(urlShorterDto: UrlShorterDto,request: HttpServletRequest): ResponseMessage {
         val urlShorter:UrlShorter?=urlShorterRepository.findUrlShorterByTargetUrl(urlShorterDto.targetUrl)
         if (ObjectUtils.isEmpty(urlShorter)) {
+            /**
+             *  Generate a Random URL
+             */
+            var url= Utils.generateRandom(appConfig.urlLength)
+            if (!ObjectUtils.isEmpty(urlShorterDto.customUrl)){
+                val customUrl:UrlShorter?=urlShorterRepository.findUrlShorterByUrl(urlShorterDto.customUrl!!)
+                // Check if the customURL exist
+                if (!ObjectUtils.isEmpty(customUrl)){
+                    return ResponseMessage(false,"This Custom Url exist",urlShorterDto.customUrl, urlShorterDto.targetUrl)
+
+                }
+                // Replace generated URL by CustomURL
+                url=urlShorterDto.customUrl
+
+            }
+            // Save to DB
             val newUrlShorter: UrlShorter = urlShorterRepository.save(
                 UrlShorter(
-                    url = Utils.generateRandom(appConfig.urlLength),
+                    url =url ,
                     targetUrl = urlShorterDto.targetUrl
                 )
             )

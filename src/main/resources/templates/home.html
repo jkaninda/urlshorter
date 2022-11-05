@@ -17,7 +17,7 @@
 <div class="form">
     <input type="url" id="targetUrl" x-model="shorter.targetUrl" placeholder="Put Your Long URL Here">
     <div>
-        <input type="text" maxlength=20 id="custominput" placeholder="Custom URL">
+        <input type="text" x-model="shorter.customUrl" maxlength=20  placeholder="Custom URL">
         <div x-show="error">
         <p id="error" style="color:red;"><span x-text="message"></span></p>
         </div>
@@ -50,6 +50,7 @@
             message:'',
             shorter:{
                 targetUrl:'',
+                customUrl:'',
             },
             copyShortUrl(){
                 navigator.clipboard.writeText(this.url)
@@ -71,13 +72,14 @@
                                 this.url = data.shortUrl
                                 this.message = data.message
                                 this.shorter.targetUrl = ''
-
                             } else {
                                 this.error = true
                                 this.success = false
-                                if (data.status === 409) {
+                                if (data.success===false){
+                                    this.message = data.message
+                                }else if(data.status === 409) {
                                     this.message = "This Url exist"
-                                } else {
+                                }else {
                                     alert('Something went wrong')
 
                                 }
