@@ -1,17 +1,17 @@
 version: "3.7"
 services:
 
-  postgres:
+  db:
     image: postgres:14.5
-    container_name: postgres
+    container_name: db
     pull_policy: if_not_present
     restart: unless-stopped
     volumes:
       - ./postgres:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: ${DB_DATABASE}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
     networks:
       - default
   urlshorter:
@@ -23,7 +23,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - URL_LENGHT=4
-      - DOMAIN_URL=http/localhost:8080
+      - DOMAIN_URL=http://localhost:8080
     tty: true
     restart: unless-stopped
     ports:

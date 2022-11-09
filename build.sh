@@ -7,4 +7,4 @@ if [ $# -eq 0 ]
 fi
 ./mvnw  clean package
 
-docker build -t jkaninda/urlshorter:$tag .
+docker build -f dev.Dockerfile -t jkaninda/urlshorter:$tag .
